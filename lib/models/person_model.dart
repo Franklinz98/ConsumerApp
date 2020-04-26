@@ -1,6 +1,6 @@
 class Person {
   final int id;
-  final int course_id;
+  final int courseId;
   final String name;
   final String username;
   final String birthday;
@@ -9,6 +9,6 @@ class Person {
   final String location;
   final String phone;
 
-  const Person(this.id, this.course_id, this.name, this.username, this.birthday, this.email,
+  const Person(this.id, this.courseId, this.name, this.username, this.birthday, this.email,
       this.address, this.location, this.phone);
 }

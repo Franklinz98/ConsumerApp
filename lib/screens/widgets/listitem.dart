@@ -1,5 +1,4 @@
 import 'package:consumo_web/constants/colors.dart';
-import 'package:consumo_web/screens/widgets/course_detail.dart';
 import 'package:flutter/material.dart';
 
 class ListItem extends StatelessWidget {

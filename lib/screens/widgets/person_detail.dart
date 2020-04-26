@@ -1,11 +1,9 @@
 import 'package:consumo_web/models/person_model.dart';
-import 'package:consumo_web/screens/widgets/listitem.dart';
 import 'package:consumo_web/screens/widgets/profile_data.dart';
 import 'package:flutter/material.dart';
-import 'package:line_icons/line_icons.dart';
 
 class PersonDetails extends StatelessWidget {
-  Person person;
+  final Person person;
 
   PersonDetails({Key key, @required this.person}) : super(key: key);
 

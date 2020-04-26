@@ -1,15 +1,17 @@
 import 'package:consumo_web/constants/colors.dart';
 import 'package:consumo_web/models/list_model.dart';
+import 'package:consumo_web/models/user_model.dart';
 import 'package:consumo_web/screens/widgets/content_list.dart';
 import 'package:consumo_web/screens/widgets/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MainContainer extends StatefulWidget {
+  final User user;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final ListModel model;
 
-  MainContainer({Key key, @required this.model}) : super(key: key);
+  MainContainer({Key key, @required this.model, @required this.user}) : super(key: key);
 
   @override
   _MainContainerState createState() => _MainContainerState();
@@ -37,8 +39,8 @@ class _MainContainerState extends State<MainContainer> {
         ),
         drawer: CustomDrawer(
           scaffoldKey: widget._scaffoldKey,
-          name: "Jane Doe",
-          email: "user@example.com",
+          name: widget.user.name,
+          email: "${widget.user.username}@test.com",
           onTap1: () {
             lists.changeList(0);
             widget._scaffoldKey.currentState.openEndDrawer();

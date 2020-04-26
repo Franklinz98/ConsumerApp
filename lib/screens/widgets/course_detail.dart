@@ -1,7 +1,6 @@
 import 'package:consumo_web/models/course_model.dart';
 import 'package:consumo_web/models/person_model.dart';
 import 'package:consumo_web/screens/widgets/listitem.dart';
-import 'package:consumo_web/screens/widgets/person_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 

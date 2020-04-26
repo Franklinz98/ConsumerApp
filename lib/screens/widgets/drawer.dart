@@ -37,7 +37,7 @@ class CustomDrawer extends StatelessWidget {
                     image: DecorationImage(
                       fit: BoxFit.cover,
                       image: NetworkImage(
-                          'https://api.adorable.io/avatars/285/abott@adorable.png'),
+                          'https://api.adorable.io/avatars/285/${this.email}'),
                     ),
                     shape: BoxShape.circle,
                   ),
@@ -49,7 +49,7 @@ class CustomDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
                         Text(
-                          "Jane Doe",
+                          this.name,
                           style: TextStyle(
                             fontFamily: "Roboto",
                             fontWeight: FontWeight.w500,
@@ -58,7 +58,7 @@ class CustomDrawer extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "user@example.com",
+                          this.email,
                           style: TextStyle(
                             fontFamily: "Roboto",
                             fontSize: 14,
