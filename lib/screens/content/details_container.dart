@@ -1,5 +1,5 @@
 import 'package:consumo_web/constants/colors.dart';
-import 'package:consumo_web/models/list_model.dart';
+import 'package:consumo_web/providers/list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +12,7 @@ class DetailsContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ListModel>(builder: (context, lists, child) {
+    return Consumer<ListProvider>(builder: (context, lists, child) {
       return Scaffold(
         key: this._scaffoldKey,
         backgroundColor: AppColors.alabaster,

@@ -1,16 +1,41 @@
+import 'package:consumo_web/backend/auth.dart' as backend;
 import 'package:consumo_web/constants/colors.dart';
+import 'package:consumo_web/models/user_model.dart';
+import 'package:consumo_web/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SignUp extends StatelessWidget {
+class SignUp extends StatefulWidget {
+  final AuthProvider authProvider;
   final switchWidget;
+  final GlobalKey<ScaffoldState> scaffoldKey;
+
+  SignUp(
+      {Key key,
+      @required this.authProvider,
+      @required this.switchWidget,
+      @required this.scaffoldKey})
+      : super(key: key);
+
+  @override
+  _SignUpState createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
   final controllerName = TextEditingController();
   final controllerUsername = TextEditingController();
   final controllerEmail = TextEditingController();
   final controllerPassword = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
-  SignUp({Key key, @required this.switchWidget})
-      : super(key: key);
+  Widget buttonChild = Text(
+    "ACEPTAR",
+    style: TextStyle(
+      fontFamily: "Roboto",
+      fontWeight: FontWeight.w500,
+      fontSize: 14,
+      color: Colors.white,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -103,18 +128,11 @@ class SignUp extends StatelessWidget {
                       color: AppColors.ocean_green,
                       height: 46.0,
                       shape: StadiumBorder(),
-                      child: Text(
-                        "ACEPTAR",
-                        style: TextStyle(
-                          fontFamily: "Roboto",
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: buttonChild,
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
-                          // TODO login stuff
+                          // signup request
+                          _futureBuilder();
                         }
                       }),
                 ),
@@ -133,7 +151,7 @@ class SignUp extends StatelessWidget {
                           color: AppColors.ocean_green,
                         ),
                       ),
-                      onPressed: this.switchWidget),
+                      onPressed: widget.switchWidget),
                 )
               ],
             ),
@@ -141,5 +159,75 @@ class SignUp extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Get Future Builder
+  _futureBuilder() {
+    setState(() {
+      // Change Text for FutureBuilder
+      buttonChild = FutureBuilder<User>(
+        // Future: HTTP Request
+        future: backend.signUp(controllerEmail.text, controllerPassword.text,
+            controllerUsername.text, controllerName.text),
+        builder: (context, snapshot) {
+          // Succesful request: bind data
+          if (snapshot.hasData) {
+            User user = snapshot.data;
+            _writePreferences(user);
+            // Add callback for the end of build
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              widget.authProvider
+                  .connect(user.name, user.email, user.username, user.token);
+              Navigator.pop(context);
+            });
+            return Text(
+              "ACEPTAR",
+              style: TextStyle(
+                fontFamily: "Roboto",
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            );
+          } else if (snapshot.hasError) {
+            // Add callback for the end of build
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              widget.scaffoldKey.currentState.showSnackBar(
+                SnackBar(
+                  content: Text(snapshot.error.toString()),
+                ),
+              );
+            });
+            return Text(
+              "ACEPTAR",
+              style: TextStyle(
+                fontFamily: "Roboto",
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            );
+          }
+          // By default, show a loading spinner.
+          return SizedBox(
+            height: 24.0,
+            width: 24.0,
+            child: CircularProgressIndicator(
+              strokeWidth: 3.0,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          );
+        },
+      );
+    });
+  }
+
+// Save user data after register
+  _writePreferences(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('token', user.token);
+    prefs.setString('name', user.name);
+    prefs.setString('username', user.username);
+    prefs.setString('email', user.email);
   }
 }

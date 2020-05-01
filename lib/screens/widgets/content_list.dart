@@ -1,6 +1,6 @@
 import 'package:consumo_web/models/course_model.dart';
-import 'package:consumo_web/models/list_model.dart';
 import 'package:consumo_web/models/person_model.dart';
+import 'package:consumo_web/providers/list_provider.dart';
 import 'package:consumo_web/screens/content/details_container.dart';
 import 'package:consumo_web/screens/widgets/course_detail.dart';
 import 'package:consumo_web/screens/widgets/listitem.dart';
@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 
 class ContentList extends StatefulWidget {
   final scaffoldKey;
-  final ListModel model;
+  final ListProvider model;
 
   const ContentList({Key key, this.scaffoldKey, @required this.model})
       : super(key: key);
@@ -27,7 +27,7 @@ class _ContentListState extends State<ContentList> {
     // TODO fetch ContentList
   }
 
-  Widget _listView(ListModel model) {
+  Widget _listView(ListProvider model) {
     switch (model.listView) {
       case 1:
         return ListView.builder(
@@ -53,7 +53,7 @@ class _ContentListState extends State<ContentList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChangeNotifierProvider<ListModel>.value(
+                    builder: (context) => ChangeNotifierProvider<ListProvider>.value(
                       value: model,
                       child: DetailsContainer(
                           content: PersonDetails(
@@ -92,7 +92,7 @@ class _ContentListState extends State<ContentList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChangeNotifierProvider<ListModel>.value(
+                    builder: (context) => ChangeNotifierProvider<ListProvider>.value(
                       value: model,
                       child: DetailsContainer(
                           content: PersonDetails(
@@ -128,7 +128,7 @@ class _ContentListState extends State<ContentList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ChangeNotifierProvider<ListModel>.value(
+                      builder: (context) => ChangeNotifierProvider<ListProvider>.value(
                       value: model,
                       child: DetailsContainer(
                           content: CourseDetails(
