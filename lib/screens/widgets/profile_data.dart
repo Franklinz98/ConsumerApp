@@ -1,10 +1,10 @@
 import 'package:consumo_web/models/person_model.dart';
 import 'package:flutter/material.dart';
 
-class PersonData extends StatelessWidget {
+class ProfileData extends StatelessWidget {
   final Person person;
 
-  const PersonData({Key key, @required this.person}) : super(key: key);
+  const ProfileData({Key key, @required this.person}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +29,14 @@ class PersonData extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Container(
-                  height: 98.00,
-                  width: 98.00,
+                  height: 110.00,
+                  width: 110.00,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.cover,
                       image: NetworkImage(
-                          'https://api.adorable.io/avatars/285/'+person.email),
+                          'https://api.adorable.io/avatars/285/' +
+                              person.email),
                     ),
                     shape: BoxShape.circle,
                   ),
@@ -68,8 +69,8 @@ class PersonData extends StatelessWidget {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
-                              new Text(
-                                person.birthday,
+                              Text(
+                                person.birthday.substring(0, 10),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: "Roboto",
@@ -77,7 +78,7 @@ class PersonData extends StatelessWidget {
                                   color: Color(0xff444444),
                                 ),
                               ),
-                              new Text(
+                              Text(
                                 person.email,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
@@ -86,7 +87,7 @@ class PersonData extends StatelessWidget {
                                   color: Color(0xff444444),
                                 ),
                               ),
-                              new Text(
+                              Text(
                                 person.phone,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
@@ -106,7 +107,7 @@ class PersonData extends StatelessWidget {
             ),
           ),
           Text(
-            person.location,
+            person.city + ', ' + person.country,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: "Roboto",

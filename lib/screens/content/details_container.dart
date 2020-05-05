@@ -8,40 +8,39 @@ class DetailsContainer extends StatelessWidget {
   final Widget content;
   final String title;
 
-  DetailsContainer({Key key, @required this.content, @required this.title}) : super(key: key);
+  DetailsContainer({Key key, @required this.content, @required this.title})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ListProvider>(builder: (context, lists, child) {
-      return Scaffold(
-        key: this._scaffoldKey,
-        backgroundColor: AppColors.alabaster,
-        appBar: AppBar(
-          leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: AppColors.tundora,
-              ),
-              onPressed: () => Navigator.pop(context)),
-          title: Text(
-            this.title,
-            style: TextStyle(
-              fontFamily: "Roboto",
-              fontWeight: FontWeight.w500,
-              fontSize: 20,
+    return Scaffold(
+      key: this._scaffoldKey,
+      backgroundColor: AppColors.alabaster,
+      appBar: AppBar(
+        leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
               color: AppColors.tundora,
             ),
+            onPressed: () => Navigator.pop(context)),
+        title: Text(
+          this.title,
+          style: TextStyle(
+            fontFamily: "Roboto",
+            fontWeight: FontWeight.w500,
+            fontSize: 20,
+            color: AppColors.tundora,
           ),
-          backgroundColor: Colors.white,
         ),
-        body: this.content,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColors.ocean_green,
-          onPressed: () {},
-          tooltip: 'Add',
-          child: Icon(Icons.add),
-        ),
-      );
-    });
+        backgroundColor: Colors.white,
+      ),
+      body: this.content,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.ocean_green,
+        onPressed: () {},
+        tooltip: 'Add',
+        child: Icon(Icons.add),
+      ),
+    );
   }
 }

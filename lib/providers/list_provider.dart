@@ -1,28 +1,32 @@
 import 'dart:collection';
 
-import 'package:consumo_web/models/course_model.dart';
-import 'package:consumo_web/models/person_model.dart';
+import 'package:consumo_web/models/course_data.dart';
+import 'package:consumo_web/models/person_data.dart';
 import 'package:flutter/material.dart';
 
 class ListProvider extends ChangeNotifier {
-  int listView = 0;
+  int _listView = 0;
   String title = "Cursos";
-  List<Person> _professors = [];
-  List<Person> _students = [];
-  List<Course> _courses = [];
+  List<PersonData> _professors = [];
+  List<PersonData> _students = [];
+  List<CourseData> _courses = [];
 
-  UnmodifiableListView<Person> get professors =>
+  UnmodifiableListView<PersonData> get professors =>
       UnmodifiableListView(_professors);
-  UnmodifiableListView<Person> get students => UnmodifiableListView(_students);
-  UnmodifiableListView<Course> get courses => UnmodifiableListView(_courses);
+  UnmodifiableListView<PersonData> get students =>
+      UnmodifiableListView(_students);
+  UnmodifiableListView<CourseData> get courses =>
+      UnmodifiableListView(_courses);
+  int get view => _listView;
 
-  void changeList(int k, List list) {
-    listView = k;
-    switch (k) {
+  void changeList(List list) {
+    switch (_listView) {
       case 1:
+        _professors = list;
         title = "Profesores";
         break;
       case 2:
+        _students = list;
         title = "Estudiantes";
         break;
       default:
@@ -30,6 +34,25 @@ class ListProvider extends ChangeNotifier {
         title = "Cursos";
         break;
     }
-    // notifyListeners();
+  }
+
+  set view(int index) {
+    _listView = index;
+    switch (index) {
+      case 1:
+        title = "Profesores";
+        break;
+      case 2:
+        title = "Estudiantes";
+        break;
+      default:
+        title = "Cursos";
+        break;
+    }
+  }
+
+  void addCourse(CourseData course) {
+    _courses.add(course);
+    notifyListeners();
   }
 }

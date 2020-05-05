@@ -1,6 +1,9 @@
 import 'package:consumo_web/backend/auth.dart' as backend;
 import 'package:consumo_web/backend/courses.dart';
+import 'package:consumo_web/backend/professors.dart';
+import 'package:consumo_web/backend/students.dart';
 import 'package:consumo_web/constants/colors.dart';
+import 'package:consumo_web/models/user_model.dart';
 import 'package:consumo_web/providers/auth_provider.dart';
 import 'package:consumo_web/providers/list_provider.dart';
 import 'package:consumo_web/screens/widgets/container/landing_page.dart';
@@ -40,9 +43,9 @@ class _MainContainerState extends State<MainContainer> {
     return !widget.authState.isLogged
         ? LandingPage(authState: widget.authState)
         : Consumer<ListProvider>(builder: (context, lists, child) {
+            User user = widget.authState.user;
             if (futureList == null) {
-              futureList = fetchCourses(
-                  widget.authState.username, widget.authState.token, '1');
+              futureList = fetchCourses(user.username, user.token);
             }
             _futureBuilder(lists);
             return Scaffold(
@@ -62,41 +65,113 @@ class _MainContainerState extends State<MainContainer> {
               ),
               drawer: CustomDrawer(
                 scaffoldKey: widget._scaffoldKey,
-                name: widget.authState.name,
-                email: widget.authState.email,
+                name: user.name,
+                email: user.email,
                 coursesOnTap: () {
                   setState(() {
-                    futureList = fetchCourses(
-                        widget.authState.username, widget.authState.token, '1');
+                    lists.view = 0;
+                    futureList = fetchCourses(user.username, user.token);
                   });
-                  /* fetchCourses(widget.authState.username,
-                          widget.authState.token, '1')
-                      .then((val) {
-                    lists.changeList(0, val[2]);
-                  }); */
                 },
                 professorsOnTap: () {
-                  lists.changeList(1, List());
-                  widget._scaffoldKey.currentState.openEndDrawer();
+                  setState(() {
+                    lists.view = 1;
+                    futureList = fetchProfessors(user.username, user.token);
+                  });
                 },
                 studentsOnTap: () {
-                  lists.changeList(2, List());
+                  setState(() {
+                    lists.view = 2;
+                    futureList = fetchStudents(user.username, user.token);
+                  });
+                },
+                onReset: () {
                   widget._scaffoldKey.currentState.openEndDrawer();
+                  widget._scaffoldKey.currentState.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Reiniciando BD...',
+                      ),
+                    ),
+                  );
+                  backend.resetDB(user.username, user.token).then(
+                    (resetted) {
+                      if (resetted) {
+                        setState(() {
+                          switch (lists.view) {
+                            case 1:
+                              futureList =
+                                  fetchProfessors(user.username, user.token);
+                              break;
+                            case 2:
+                              futureList =
+                                  fetchStudents(user.username, user.token);
+                              break;
+                            default:
+                              futureList =
+                                  fetchCourses(user.username, user.token);
+                              break;
+                          }
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            widget._scaffoldKey.currentState
+                                .hideCurrentSnackBar();
+                            widget._scaffoldKey.currentState.showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Se reinició la BD',
+                                ),
+                              ),
+                            );
+                          });
+                        });
+                      } else {
+                        widget._scaffoldKey.currentState.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'DB wasn\'t resetted',
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ).catchError(
+                    (error) {
+                      widget._scaffoldKey.currentState.openEndDrawer();
+                      widget._scaffoldKey.currentState.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            error.toString(),
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 },
                 onLogOff: () {
                   _removePreferences();
                   widget.authState.disconnect();
                 },
               ),
-              body:
-                  /* ContentList(
-                scaffoldKey: widget._scaffoldKey,
-                model: lists,
-              ), */
-                  futureBuilder,
+              body: futureBuilder,
               floatingActionButton: FloatingActionButton(
                 backgroundColor: AppColors.ocean_green,
-                onPressed: () {},
+                onPressed: () {
+                  postCourse(user.username, user.token).then(
+                    (course) {
+                      lists.addCourse(course);
+                    },
+                  ).catchError(
+                    (error) {
+                      widget._scaffoldKey.currentState.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            error.toString(),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
                 tooltip: 'Add',
                 child: Icon(Icons.add),
               ),
@@ -118,7 +193,7 @@ class _MainContainerState extends State<MainContainer> {
         String username = prefs.getString('username');
         String email = prefs.getString('email');
         widget.authState.connect(name, email, username, token);
-        futureList = fetchCourses(username, token, '1');
+        futureList = fetchCourses(username, token);
       } else {
         print("bruh");
         widget.authState.disconnect();
@@ -148,24 +223,27 @@ class _MainContainerState extends State<MainContainer> {
           widget._scaffoldKey.currentState.openEndDrawer();
         });
         // Succesful request: bind data
-        if (snapshot.hasData) {
-          model.changeList(0, snapshot.data[2]);
-          return ContentList(
-            scaffoldKey: widget._scaffoldKey,
-            model: model,
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              "ACEPTAR",
-              style: TextStyle(
-                fontFamily: "Roboto",
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-                color: Colors.white,
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData) {
+            model.changeList(snapshot.data);
+            return ContentList(
+              scaffoldKey: widget._scaffoldKey,
+              model: model,
+              user: widget.authState.user,
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "ACEPTAR",
+                style: TextStyle(
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
         // By default, show a loading spinner.
         return Center(

@@ -1,19 +1,21 @@
-import 'package:consumo_web/models/course_model.dart';
-import 'package:consumo_web/models/person_model.dart';
+import 'package:consumo_web/models/course_data.dart';
+import 'package:consumo_web/models/person_data.dart';
+import 'package:consumo_web/models/user_model.dart';
 import 'package:consumo_web/providers/list_provider.dart';
 import 'package:consumo_web/screens/content/details_container.dart';
-import 'package:consumo_web/screens/widgets/course_detail.dart';
+import 'package:consumo_web/screens/widgets/course_details.dart';
 import 'package:consumo_web/screens/widgets/listitem.dart';
 import 'package:consumo_web/screens/widgets/person_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:provider/provider.dart';
 
 class ContentList extends StatefulWidget {
   final scaffoldKey;
   final ListProvider model;
+  final User user;
 
-  const ContentList({Key key, this.scaffoldKey, @required this.model})
+  const ContentList(
+      {Key key, this.scaffoldKey, @required this.model, @required this.user})
       : super(key: key);
 
   @override
@@ -21,19 +23,13 @@ class ContentList extends StatefulWidget {
 }
 
 class _ContentListState extends State<ContentList> {
-  @override
-  void initState() {
-    super.initState();
-    // TODO fetch ContentList
-  }
-
   Widget _listView(ListProvider model) {
-    switch (model.listView) {
+    switch (model.view) {
       case 1:
         return ListView.builder(
           padding: EdgeInsets.all(16.0),
           itemBuilder: (_, index) {
-            Person professor = model.professors[index];
+            PersonData professor = model.professors[index];
             return ListItem(
               title: professor.name,
               content: professor.username + '\n' + professor.email,
@@ -50,7 +46,17 @@ class _ContentListState extends State<ContentList> {
                 ),
               ),
               onPressed: () {
+                // TODO navigate and fetch professor
                 Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailsContainer(
+                        content: PersonDetails(
+                            personId: professor.id, type: 0, user: widget.user),
+                        title: 'Profesor'),
+                  ),
+                );
+                /* Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChangeNotifierProvider<ListProvider>.value(
@@ -62,7 +68,7 @@ class _ContentListState extends State<ContentList> {
                           title: 'Profesor'),
                     ),
                   ),
-                );
+                ); */
               },
             );
           },
@@ -72,7 +78,7 @@ class _ContentListState extends State<ContentList> {
         return ListView.builder(
           padding: EdgeInsets.all(16.0),
           itemBuilder: (_, index) {
-            Person student = model.students[index];
+            PersonData student = model.students[index];
             return ListItem(
               title: student.name,
               content: student.username + '\n' + student.email,
@@ -89,7 +95,17 @@ class _ContentListState extends State<ContentList> {
                 ),
               ),
               onPressed: () {
+                // TODO Navigate and fetch student
                 Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailsContainer(
+                        content: PersonDetails(
+                            personId: student.id, type: 1, user: widget.user),
+                        title: 'Estudiante'),
+                  ),
+                );
+                /* Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChangeNotifierProvider<ListProvider>.value(
@@ -101,22 +117,23 @@ class _ContentListState extends State<ContentList> {
                           title: 'Estudiante'),
                     ),
                   ),
-                );
+                ); */
               },
             );
           },
           itemCount: model.students.length,
+          addAutomaticKeepAlives: false,
         );
       default:
         return ListView.builder(
           padding: EdgeInsets.all(16.0),
           itemBuilder: (_, index) {
-            Course course = model.courses[index];
+            CourseData course = model.courses[index];
             return ListItem(
               title: course.name,
-              content: course.professor.name +
+              content: course.professorName +
                   '\n' +
-                  course.students.length.toString() +
+                  course.students.toString() +
                   ' Estudiantes',
               leading: Container(
                 height: 48.00,
@@ -125,7 +142,17 @@ class _ContentListState extends State<ContentList> {
                 alignment: Alignment.center,
               ),
               onPressed: () {
+                // TODO navigate and fetch course
                 Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailsContainer(
+                        content: CourseDetails(
+                            courseId: course.id, user: widget.user),
+                        title: 'Curso'),
+                  ),
+                );
+                /* Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => ChangeNotifierProvider<ListProvider>.value(
@@ -137,7 +164,7 @@ class _ContentListState extends State<ContentList> {
                           title: 'Curso'),
                     ),
                   ),
-                );
+                ); */
               },
             );
           },

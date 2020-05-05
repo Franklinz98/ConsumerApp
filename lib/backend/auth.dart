@@ -70,3 +70,22 @@ Future<bool> checkToken(String token) async {
     throw Exception('Failed to register user');
   }
 }
+
+// Reset Database
+Future<bool> resetDB(String dbId, String token) async {
+  Uri uri = Uri.https(baseUrl, '$dbId/restart');
+  final http.Response response = await http.get(
+    uri,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: "Bearer " + token,
+    },
+  );
+  if (response.statusCode == 200) {
+    Map<String, dynamic> body = json.decode(response.body);
+    bool isValid = body['result'];
+    return isValid;
+  } else {
+    throw Exception('Failed to restart DB');
+  }
+}

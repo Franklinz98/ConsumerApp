@@ -1,25 +1,23 @@
+import 'package:consumo_web/models/person_data.dart';
 import 'package:consumo_web/models/person_model.dart';
 
 class Course {
-  final id;
   final String name;
-  final Person professor;
-  final List<Person> students;
+  final PersonData professor;
+  final List<PersonData> students;
 
-  const Course({this.id, this.name, this.professor, this.students});
+  const Course({this.name, this.professor, this.students});
 
   factory Course.fromJson(Map<String, dynamic> json) {
-    final Person _professor = Person.fromJson(json['professor']);
-    final List<Person> _students = [];
+    final List<PersonData> _students = [];
     List<dynamic> studentList = json['students'];
     studentList.forEach((studentJson) {
-      _students.add(Person.fromJson(studentJson));
+      _students.add(PersonData.fromJson(studentJson));
     });
 
     return Course(
-      id: json['id'],
       name: json['name'],
-      professor: _professor,
+      professor: PersonData.fromJson(json['professor']),
       students: _students,
     );
   }

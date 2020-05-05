@@ -1,27 +1,50 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:consumo_web/models/person_data.dart';
 import 'package:consumo_web/models/person_model.dart';
 import 'package:http/http.dart' as http;
 
-const String baseUrl = 'https://movil-api.herokuapp.com';
+const String baseUrl = 'movil-api.herokuapp.com';
 
-Future<Person> fetchStudent() async {
+Future<List> fetchStudents(String dbId, String token) async {
+  Uri uri = Uri.https(baseUrl, '$dbId/students');
   final http.Response response = await http.get(
-    baseUrl + '/user/students/6',
-    headers: {
-      HttpHeaders.authorizationHeader:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImlhdCI6MTU4NzkyNDM5NiwiZXhwIjoxNTg3OTI1NTk2fQ.EsVLTBm4lkUQcVPp2AuC0zL0_H7E-hiSoZDyZ7rDmXw"
+    uri,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: "Bearer " + token,
     },
   );
-
   if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    var p = Person.fromJson(json.decode(response.body));
-    return p;
+    List<PersonData> _students = [];
+    var body = json.decode(response.body);
+    body.forEach((courseJson) {
+      _students.add(PersonData.fromJson(courseJson));
+    });
+    return _students;
+  } else if (response.statusCode == 401) {
+    Map<String, dynamic> body = json.decode(response.body)[0];
+    throw Exception(body['message']);
   } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
+    throw Exception('Failed to login User');
+  }
+}
+
+Future<Person> fetchStudent(String dbId, int studentId, String token) async {
+  Uri uri = Uri.http(baseUrl, '$dbId/students/$studentId');
+  final http.Response response = await http.get(
+    uri,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: "Bearer " + token,
+    },
+  );
+  if (response.statusCode == 200) {
+    return Person.fromJson(json.decode(response.body));
+  } else if (response.statusCode == 401) {
+    Map<String, dynamic> body = json.decode(response.body);
+    throw Exception(body['error']);
+  } else {
+    throw Exception('Failed to login User');
   }
 }

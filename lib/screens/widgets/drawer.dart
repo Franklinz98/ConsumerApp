@@ -9,6 +9,7 @@ class CustomDrawer extends StatelessWidget {
   final coursesOnTap;
   final professorsOnTap;
   final studentsOnTap;
+  final onReset;
   final onLogOff;
 
   const CustomDrawer(
@@ -19,6 +20,7 @@ class CustomDrawer extends StatelessWidget {
       @required this.coursesOnTap,
       @required this.professorsOnTap,
       @required this.studentsOnTap,
+      @required this.onReset,
       @required this.onLogOff})
       : super(key: key);
 
@@ -124,6 +126,19 @@ class CustomDrawer extends StatelessWidget {
                 dense: true,
                 onTap: this.studentsOnTap),
             Spacer(),
+            ListTile(
+                leading: Icon(LineIcons.server),
+                title: Text(
+                  "Reiniciar BD",
+                  style: TextStyle(
+                    fontFamily: "Roboto",
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color: AppColors.tundora,
+                  ),
+                ),
+                dense: true,
+                onTap: this.onReset),
             ListTile(
                 leading: Icon(LineIcons.power_off),
                 title: Text(
