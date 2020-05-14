@@ -21,4 +21,8 @@ class Course {
       students: _students,
     );
   }
+
+  void addStudent(PersonData student) {
+    students.add(student);
+  }
 }

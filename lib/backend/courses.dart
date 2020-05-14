@@ -24,7 +24,7 @@ Future<List> fetchCourses(String dbId, String token) async {
     return _courses;
   } else if (response.statusCode == 401) {
     Map<String, dynamic> body = json.decode(response.body)[0];
-    throw Exception(body['message']);
+    return Future<List>.error('Unauthorized');
   } else {
     throw Exception('Failed to login User');
   }
@@ -43,7 +43,7 @@ Future<Course> fetchCourse(String dbId, int courseId, String token) async {
     return Course.fromJson(json.decode(response.body));
   } else if (response.statusCode == 401) {
     Map<String, dynamic> body = json.decode(response.body);
-    throw Exception(body['error']);
+    return Future<Course>.error('Unauthorized');
   } else {
     throw Exception('Failed to login User');
   }
@@ -62,7 +62,7 @@ Future<CourseData> postCourse(String dbId, String token) async {
     return CourseData.fromJson(json.decode(response.body));
   } else if (response.statusCode == 401) {
     Map<String, dynamic> body = json.decode(response.body);
-    throw Exception(body['error']);
+    return Future<CourseData>.error('Unauthorized');
   } else {
     throw Exception('Failed to login User');
   }

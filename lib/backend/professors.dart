@@ -24,7 +24,7 @@ Future<List> fetchProfessors(String dbId, String token) async {
     return _professors;
   } else if (response.statusCode == 401) {
     Map<String, dynamic> body = json.decode(response.body)[0];
-    throw Exception(body['message']);
+    return Future<List>.error('Unauthorized');
   } else {
     throw Exception('Failed to login User');
   }
@@ -43,7 +43,7 @@ Future<Person> fetchProfessor(String dbId, int professorId, String token) async 
     return Person.fromJson(json.decode(response.body));
   } else if (response.statusCode == 401) {
     Map<String, dynamic> body = json.decode(response.body);
-    throw Exception(body['error']);
+    return Future<Person>.error('Unauthorized');
   } else {
     throw Exception('Failed to login User');
   }

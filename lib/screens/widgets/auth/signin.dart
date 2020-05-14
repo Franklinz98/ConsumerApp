@@ -144,7 +144,8 @@ class _SignInState extends State<SignIn> {
             _writePreferences(user);
             // Add callback for the end of build
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              widget.authProvider.connect(user.name, user.email, user.username, user.token);
+              widget.authProvider
+                  .connect(user.name, user.email, user.username, user.token);
               Navigator.pop(context);
             });
             return Text(

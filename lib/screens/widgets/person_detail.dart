@@ -45,77 +45,77 @@ class _PersonDetailsState extends State<PersonDetails> {
     return FutureBuilder<Person>(
       future: futurePerson,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ProfileData(
-                  person: snapshot.data,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  "Curso:",
-                  style: TextStyle(
-                    fontFamily: "Roboto",
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    color: Colors.black,
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData) {
+            return Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ProfileData(
+                    person: snapshot.data,
                   ),
                 ),
-              ),
-              Expanded(
-                child: FutureBuilder<Course>(
-                  future: fetchCourse(widget.user.username,
-                      snapshot.data.courseId, widget.user.token),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      Course course = snapshot.data;
-                      return Column(
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  course.name,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: "Roboto",
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 20,
-                                    color: Color(0xff444444),
-                                  ),
-                                ),
-                                _courseSubtitle(),
-                              ],
-                            ),
-                          ),
-                          _coursePreview(course),
-                        ],
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error'),
-                      );
-                    }
-                    return Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.ocean_green),
-                      ),
-                    );
-                  },
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    "Curso:",
+                    style: TextStyle(
+                      fontFamily: "Roboto",
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error'),
-          );
+                Expanded(
+                  child: FutureBuilder<Course>(
+                    future: fetchCourse(widget.user.username,
+                        snapshot.data.courseId, widget.user.token),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasData) {
+                          Course course = snapshot.data;
+                          return Column(
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      course.name,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 20,
+                                        color: Color(0xff444444),
+                                      ),
+                                    ),
+                                    _courseSubtitle(),
+                                  ],
+                                ),
+                              ),
+                              _coursePreview(course),
+                            ],
+                          );
+                        } else if (snapshot.hasError) {
+                          Navigator.pop(context, 'Unauthorized');
+                        }
+                      }
+                      return Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.ocean_green),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          } else if (snapshot.hasError) {
+            Navigator.pop(context, 'Unauthorized');
+          }
         }
         // By default, show a loading spinner.
         return Center(

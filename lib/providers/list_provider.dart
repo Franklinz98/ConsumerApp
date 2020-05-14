@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 class ListProvider extends ChangeNotifier {
   int _listView = 0;
   String title = "Cursos";
+  bool _showFAB = true;
   List<PersonData> _professors = [];
   List<PersonData> _students = [];
   List<CourseData> _courses = [];
@@ -18,6 +19,7 @@ class ListProvider extends ChangeNotifier {
   UnmodifiableListView<CourseData> get courses =>
       UnmodifiableListView(_courses);
   int get view => _listView;
+  bool get isVisible => _showFAB;
 
   void changeList(List list) {
     switch (_listView) {
@@ -41,18 +43,26 @@ class ListProvider extends ChangeNotifier {
     switch (index) {
       case 1:
         title = "Profesores";
+        _showFAB = false;
         break;
       case 2:
         title = "Estudiantes";
+        _showFAB = true;
         break;
       default:
         title = "Cursos";
+        _showFAB = true;
         break;
     }
   }
 
   void addCourse(CourseData course) {
     _courses.add(course);
+    notifyListeners();
+  }
+
+  void addStudent(PersonData student) {
+    _students.add(student);
     notifyListeners();
   }
 }

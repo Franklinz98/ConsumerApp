@@ -171,42 +171,44 @@ class _SignUpState extends State<SignUp> {
             controllerUsername.text, controllerName.text),
         builder: (context, snapshot) {
           // Succesful request: bind data
-          if (snapshot.hasData) {
-            User user = snapshot.data;
-            _writePreferences(user);
-            // Add callback for the end of build
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              widget.authProvider
-                  .connect(user.name, user.email, user.username, user.token);
-              Navigator.pop(context);
-            });
-            return Text(
-              "ACEPTAR",
-              style: TextStyle(
-                fontFamily: "Roboto",
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-                color: Colors.white,
-              ),
-            );
-          } else if (snapshot.hasError) {
-            // Add callback for the end of build
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              widget.scaffoldKey.currentState.showSnackBar(
-                SnackBar(
-                  content: Text(snapshot.error.toString()),
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              User user = snapshot.data;
+              _writePreferences(user);
+              // Add callback for the end of build
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                widget.authProvider
+                    .connect(user.name, user.email, user.username, user.token);
+                Navigator.pop(context);
+              });
+              return Text(
+                "ACEPTAR",
+                style: TextStyle(
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: Colors.white,
                 ),
               );
-            });
-            return Text(
-              "ACEPTAR",
-              style: TextStyle(
-                fontFamily: "Roboto",
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-                color: Colors.white,
-              ),
-            );
+            } else if (snapshot.hasError) {
+              // Add callback for the end of build
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                widget.scaffoldKey.currentState.showSnackBar(
+                  SnackBar(
+                    content: Text(snapshot.error.toString()),
+                  ),
+                );
+              });
+              return Text(
+                "ACEPTAR",
+                style: TextStyle(
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              );
+            }
           }
           // By default, show a loading spinner.
           return SizedBox(

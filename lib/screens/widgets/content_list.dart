@@ -13,9 +13,14 @@ class ContentList extends StatefulWidget {
   final scaffoldKey;
   final ListProvider model;
   final User user;
+  final Function unauthorizedProtocol;
 
   const ContentList(
-      {Key key, this.scaffoldKey, @required this.model, @required this.user})
+      {Key key,
+      this.scaffoldKey,
+      @required this.model,
+      @required this.user,
+      @required this.unauthorizedProtocol})
       : super(key: key);
 
   @override
@@ -45,17 +50,26 @@ class _ContentListState extends State<ContentList> {
                   shape: BoxShape.circle,
                 ),
               ),
-              onPressed: () {
+              onPressed: () async {
                 // TODO navigate and fetch professor
-                Navigator.push(
+                var result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => DetailsContainer(
-                        content: PersonDetails(
-                            personId: professor.id, type: 0, user: widget.user),
-                        title: 'Profesor'),
+                      content: PersonDetails(
+                          personId: professor.id, type: 0, user: widget.user),
+                      title: 'Profesor',
+                      unauthorizedProtocol: widget.unauthorizedProtocol,
+                    ),
                   ),
                 );
+                if (result == 'Unauthorized') {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) {
+                      widget.unauthorizedProtocol();
+                    },
+                  );
+                }
                 /* Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -94,30 +108,26 @@ class _ContentListState extends State<ContentList> {
                   shape: BoxShape.circle,
                 ),
               ),
-              onPressed: () {
+              onPressed: () async {
                 // TODO Navigate and fetch student
-                Navigator.push(
+                var result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => DetailsContainer(
-                        content: PersonDetails(
-                            personId: student.id, type: 1, user: widget.user),
-                        title: 'Estudiante'),
-                  ),
-                );
-                /* Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChangeNotifierProvider<ListProvider>.value(
-                      value: model,
-                      child: DetailsContainer(
-                          content: PersonDetails(
-                            person: student,
-                          ),
-                          title: 'Estudiante'),
+                      content: PersonDetails(
+                          personId: student.id, type: 1, user: widget.user),
+                      title: 'Estudiante',
+                      unauthorizedProtocol: widget.unauthorizedProtocol,
                     ),
                   ),
-                ); */
+                );
+                if (result == 'Unauthorized') {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) {
+                      widget.unauthorizedProtocol();
+                    },
+                  );
+                }
               },
             );
           },
@@ -141,30 +151,26 @@ class _ContentListState extends State<ContentList> {
                 child: Icon(LineIcons.university),
                 alignment: Alignment.center,
               ),
-              onPressed: () {
+              onPressed: () async {
                 // TODO navigate and fetch course
-                Navigator.push(
+                var result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => DetailsContainer(
-                        content: CourseDetails(
-                            courseId: course.id, user: widget.user),
-                        title: 'Curso'),
-                  ),
-                );
-                /* Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ChangeNotifierProvider<ListProvider>.value(
-                      value: model,
-                      child: DetailsContainer(
-                          content: CourseDetails(
-                            course: course,
-                          ),
-                          title: 'Curso'),
+                      content:
+                          CourseDetails(courseId: course.id, user: widget.user),
+                      title: 'Curso',
+                      unauthorizedProtocol: widget.unauthorizedProtocol,
                     ),
                   ),
-                ); */
+                );
+                if (result == 'Unauthorized') {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) {
+                      widget.unauthorizedProtocol();
+                    },
+                  );
+                }
               },
             );
           },

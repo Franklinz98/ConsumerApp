@@ -147,33 +147,33 @@ class _MainContainerState extends State<MainContainer> {
                     },
                   );
                 },
-                onLogOff: () {
-                  _removePreferences();
-                  widget.authState.disconnect();
-                },
+                onLogOff: _unauthorizedProtocol,
               ),
               body: futureBuilder,
-              floatingActionButton: FloatingActionButton(
-                backgroundColor: AppColors.ocean_green,
-                onPressed: () {
-                  postCourse(user.username, user.token).then(
-                    (course) {
-                      lists.addCourse(course);
-                    },
-                  ).catchError(
-                    (error) {
-                      widget._scaffoldKey.currentState.showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            error.toString(),
-                          ),
-                        ),
+              floatingActionButton: Visibility(
+                visible: lists.isVisible,
+                child: FloatingActionButton(
+                  backgroundColor: AppColors.ocean_green,
+                  onPressed: () {
+                    if (lists.view == 0) {
+                      postCourse(user.username, user.token).then(
+                        (course) {
+                          lists.addCourse(course);
+                        },
+                      ).catchError(
+                        (error) {
+                          if (error.toString() == 'Unauthorized') {
+                            _unauthorizedProtocol();
+                          }
+                        },
                       );
-                    },
-                  );
-                },
-                tooltip: 'Add',
-                child: Icon(Icons.add),
+                    } else if (lists.view == 2) {
+                      _addStudentDialog(user, lists);
+                    }
+                  },
+                  tooltip: 'Add',
+                  child: Icon(Icons.add),
+                ),
               ),
             );
           });
@@ -196,12 +196,20 @@ class _MainContainerState extends State<MainContainer> {
         futureList = fetchCourses(username, token);
       } else {
         print("bruh");
-        widget.authState.disconnect();
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) {
+            widget.authState.disconnect();
+          },
+        );
       }
     })
         // if not, set state to disconnected
         .catchError((error) {
-      widget.authState.disconnect();
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) {
+          widget.authState.disconnect();
+        },
+      );
     });
   }
 
@@ -230,19 +238,16 @@ class _MainContainerState extends State<MainContainer> {
               scaffoldKey: widget._scaffoldKey,
               model: model,
               user: widget.authState.user,
+              unauthorizedProtocol: _unauthorizedProtocol,
             );
           } else if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                "ACEPTAR",
-                style: TextStyle(
-                  fontFamily: "Roboto",
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Colors.white,
-                ),
-              ),
-            );
+            if (snapshot.error.toString() == 'Unauthorized') {
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) {
+                  _unauthorizedProtocol();
+                },
+              );
+            }
           }
         }
         // By default, show a loading spinner.
@@ -253,5 +258,94 @@ class _MainContainerState extends State<MainContainer> {
         );
       },
     );
+  }
+
+  _addStudentDialog(User user, ListProvider lists) {
+    final _formKey = GlobalKey<FormState>();
+    final controllerId = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text(
+            "Agregar estudiante",
+            style: TextStyle(
+              fontFamily: "Roboto",
+              fontWeight: FontWeight.w500,
+              color: AppColors.tundora,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TextFormField(
+                        controller: controllerId,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Ingrese el id del curso';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'ID del curso',
+                          hintText: '1234',
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: MaterialButton(
+                        color: AppColors.ocean_green,
+                        height: 46.0,
+                        shape: StadiumBorder(),
+                        child: Text(
+                          "ACEPTAR",
+                          style: TextStyle(
+                            fontFamily: "Roboto",
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          postStudent(user.username,
+                                  int.parse(controllerId.text), user.token)
+                              .then(
+                            (student) {
+                              lists.addStudent(student);
+                            },
+                          ).catchError(
+                            (error) {
+                              _unauthorizedProtocol();
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  _unauthorizedProtocol() {
+    widget.authState.disconnect();
+    _removePreferences();
   }
 }
