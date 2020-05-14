@@ -53,9 +53,11 @@ class DetailsContainer extends StatelessWidget {
               (student) {
                 cd.courseDetailsState.addStudent(student);
               },
+              
             ).catchError(
               (error) {
                 if (error.toString() == 'Unauthorized') {
+                  Navigator.maybePop(context);
                   WidgetsBinding.instance.addPostFrameCallback(
                     (_) {
                       this.unauthorizedProtocol();

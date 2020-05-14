@@ -29,15 +29,18 @@ class PersonDetails extends StatefulWidget {
 
 class _PersonDetailsState extends State<PersonDetails> {
   Future<Person> futurePerson;
-
+  int type;
   @override
   void initState() {
     super.initState();
-    futurePerson = widget.type == 0
-        ? fetchProfessor(
-            widget.user.username, widget.personId, widget.user.token)
-        : fetchStudent(
-            widget.user.username, widget.personId, widget.user.token);
+    type = widget.type;
+    if (type == 0 || type == 2) {
+      futurePerson = fetchProfessor(
+          widget.user.username, widget.personId, widget.user.token);
+    } else {
+      futurePerson = fetchStudent(
+          widget.user.username, widget.personId, widget.user.token);
+    }
   }
 
   @override
@@ -47,74 +50,90 @@ class _PersonDetailsState extends State<PersonDetails> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
-            return Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ProfileData(
-                    person: snapshot.data,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    "Curso:",
-                    style: TextStyle(
-                      fontFamily: "Roboto",
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                      color: Colors.black,
+            if (type == 0 || type == 1) {
+              return Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ProfileData(
+                      person: snapshot.data,
                     ),
                   ),
-                ),
-                Expanded(
-                  child: FutureBuilder<Course>(
-                    future: fetchCourse(widget.user.username,
-                        snapshot.data.courseId, widget.user.token),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.hasData) {
-                          Course course = snapshot.data;
-                          return Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                child: Column(
-                                  children: <Widget>[
-                                    Text(
-                                      course.name,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontFamily: "Roboto",
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 20,
-                                        color: Color(0xff444444),
-                                      ),
-                                    ),
-                                    _courseSubtitle(),
-                                  ],
-                                ),
-                              ),
-                              _coursePreview(course),
-                            ],
-                          );
-                        } else if (snapshot.hasError) {
-                          Navigator.pop(context, 'Unauthorized');
-                        }
-                      }
-                      return Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.ocean_green),
-                        ),
-                      );
-                    },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      "Curso:",
+                      style: TextStyle(
+                        fontFamily: "Roboto",
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            );
+                  Expanded(
+                    child: FutureBuilder<Course>(
+                      future: fetchCourse(widget.user.username,
+                          snapshot.data.courseId, widget.user.token),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.hasData) {
+                            Course course = snapshot.data;
+                            return Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Text(
+                                        course.name,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 20,
+                                          color: Color(0xff444444),
+                                        ),
+                                      ),
+                                      _courseSubtitle(),
+                                    ],
+                                  ),
+                                ),
+                                _coursePreview(course),
+                              ],
+                            );
+                          } else if (snapshot.hasError) {
+                            Navigator.pop(context, 'Unauthorized');
+                          }
+                        }
+                        return Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.ocean_green),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return Column(children: <Widget>[
+                Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ProfileData(
+                      person: snapshot.data,
+                    ))
+              ]);
+            }
           } else if (snapshot.hasError) {
-            Navigator.pop(context, 'Unauthorized');
+            if (type == 0 || type == 1) {
+              Navigator.pop(context, 'Unauthorized');
+            }else{
+              Navigator.pop(context, 'Unauthorized');
+            }
+
           }
         }
         // By default, show a loading spinner.

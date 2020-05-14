@@ -26,6 +26,7 @@ class _SignInState extends State<SignIn> {
   final controllerEmail = TextEditingController();
   final controllerPassword = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _remember=false;
   Widget buttonChild = Text(
     "ACEPTAR",
     style: TextStyle(
@@ -36,6 +37,12 @@ class _SignInState extends State<SignIn> {
     ),
   );
 
+  @override
+  void initState() {
+    super.initState();
+    // load data on startup
+    _readPreferences();
+  }
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -87,6 +94,15 @@ class _SignInState extends State<SignIn> {
                     ),
                   ),
                 ),
+                Padding(
+                    padding: EdgeInsets.only(top: 20),
+                    child: CheckboxListTile(
+                      activeColor: AppColors.ocean_green,
+                        title: Text("Recordarme"),
+                        value: _remember,
+                        onChanged: (bool value) {
+                          setState((){_remember=value;});
+                        })),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: MaterialButton(
@@ -197,5 +213,28 @@ class _SignInState extends State<SignIn> {
     prefs.setString('name', user.name);
     prefs.setString('username', user.username);
     prefs.setString('email', user.email);
+    
+    if(_remember){
+      prefs.setBool('remember', true);
+      prefs.setString('r_email', user.email);
+      prefs.setString('r_password', controllerPassword.text);      
+    }else{
+      prefs.setBool('remember', false);
+      prefs.remove('r_password');
+      prefs.remove('r_email');
+    }
+    controllerEmail.clear();
+    controllerPassword.clear();
+  }
+  _readPreferences() async{
+    final prefs = await SharedPreferences.getInstance();
+    if(prefs.getBool('remember')!=null && prefs.getBool('remember')){
+      controllerEmail.text=prefs.getString('r_email');
+      controllerPassword.text=prefs.getString('r_password');
+      setState((){_remember=true;});
+    }else{
+      controllerEmail.clear();
+      controllerPassword.clear();
+    }
   }
 }

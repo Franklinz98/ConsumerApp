@@ -39,12 +39,14 @@ Future<Person> fetchStudent(String dbId, int studentId, String token) async {
       HttpHeaders.authorizationHeader: "Bearer " + token,
     },
   );
+
   if (response.statusCode == 200) {
     return Person.fromJson(json.decode(response.body));
   } else if (response.statusCode == 401) {
     Map<String, dynamic> body = json.decode(response.body);
     return Future<Person>.error('Unauthorized');
   } else {
+    print(response.body);
     throw Exception('Failed to login User');
   }
 }
