@@ -45,6 +45,7 @@ class _MainContainerState extends State<MainContainer> {
         : Consumer<ListProvider>(builder: (context, lists, child) {
             User user = widget.authState.user;
             if (futureList == null) {
+              lists.view=0;
               futureList = fetchCourses(user.username, user.token);
             }
             _futureBuilder(lists);
@@ -345,6 +346,8 @@ class _MainContainerState extends State<MainContainer> {
   }
 
   _unauthorizedProtocol() {
+    Navigator.of(context).maybePop();
+    futureList=null;
     widget.authState.disconnect();
     _removePreferences();
   }

@@ -47,7 +47,7 @@ class ListProvider extends ChangeNotifier {
         break;
       case 2:
         title = "Estudiantes";
-        _showFAB = true;
+        _showFAB = false;
         break;
       default:
         title = "Cursos";

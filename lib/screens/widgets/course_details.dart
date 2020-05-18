@@ -3,14 +3,16 @@ import 'package:consumo_web/constants/colors.dart';
 import 'package:consumo_web/models/course_model.dart';
 import 'package:consumo_web/models/person_data.dart';
 import 'package:consumo_web/models/user_model.dart';
+import 'package:consumo_web/screens/content/details_container.dart';
 import 'package:consumo_web/screens/widgets/listitem.dart';
+import 'package:consumo_web/screens/widgets/person_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 
 class CourseDetails extends StatefulWidget {
   final int courseId;
   final User user;
-
+  
   CourseDetails({Key key, @required this.courseId, @required this.user})
       : super(key: key);
 
@@ -109,6 +111,29 @@ class _CourseDetailsState extends State<CourseDetails> {
                             shape: BoxShape.circle,
                           ),
                         ),
+                        onPressed: () async {
+                          //profesor details
+                          var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailsContainer(
+                                  content: PersonDetails(
+                                      personId: course.professor.id,
+                                      type: 2,
+                                      user: widget.user),
+                                  title: 'Profesor',
+                                  unauthorizedProtocol: () {}
+                                  ),
+                            ),
+                          );
+                          if (result == 'Unauthorized') {
+                            WidgetsBinding.instance.addPostFrameCallback(
+                              (_) {
+                                Navigator.pop(context,'Unauthorized');
+                              },
+                            );
+                          }
+                        },
                       ),
                       ListTile(
                         leading: Icon(LineIcons.users),
@@ -147,6 +172,29 @@ class _CourseDetailsState extends State<CourseDetails> {
                             shape: BoxShape.circle,
                           ),
                         ),
+                        onPressed: () async {
+                          //student details
+                          var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailsContainer(
+                                  content: PersonDetails(
+                                      personId: student.id,
+                                      type: 3,
+                                      user: widget.user),
+                                  title: 'Estudiante',
+                                  unauthorizedProtocol: () {}
+                                  ),
+                            ),
+                          );
+                          if (result == 'Unauthorized') {
+                            WidgetsBinding.instance.addPostFrameCallback(
+                              (_) {
+                                Navigator.pop(context,'Unauthorized');
+                              },
+                            );
+                          }
+                        },
                       );
                     },
                     itemCount: course.students.length,
